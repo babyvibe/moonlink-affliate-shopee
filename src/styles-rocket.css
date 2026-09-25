@@ -1,0 +1,1162 @@
+/* ----- Tên lửa bay vòng quanh nút submit (local, không che UI) ----- */
+.moon-zone {
+  position: relative;
+  overflow: visible;
+}
+.mini-rocket-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 38px;
+  height: 66px;
+  margin: -33px 0 0 -19px;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: 50% 50%;
+}
+.mini-rocket {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 8px #8ab4ff99);
+}
+.mini-rocket svg {
+  width: 100%;
+  height: 100%;
+}
+.mini-flame {
+  transform-origin: 20px 60px;
+  animation: flameFlicker 0.12s ease-in-out infinite alternate;
+}
+.mini-sparks {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+}
+.mini-sparks i {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: #ffb347;
+  box-shadow: 0 0 8px #ff5a1f;
+}
+
+/* Đánh lửa tại chỗ trên mặt trăng */
+.phase-ignition .mini-rocket-wrap {
+  opacity: 1;
+  animation: miniShake 0.45s ease both;
+}
+.phase-ignition .mini-sparks {
+  opacity: 1;
+  animation: sparkBurst 0.5s ease-out both;
+}
+
+/* Cất cánh + bay vòng quanh nút */
+.phase-ascent .mini-rocket-wrap {
+  opacity: 1;
+  animation: miniAscent 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.phase-orbit .mini-rocket-wrap {
+  opacity: 1;
+  animation: miniOrbit 1.6s linear infinite;
+}
+.phase-orbit .mini-sparks {
+  opacity: 1;
+  animation: sparkOrbit 1.6s linear infinite;
+}
+
+/* Quay về mặt trăng */
+.phase-reentry .mini-rocket-wrap {
+  opacity: 1;
+  animation: miniReturn 0.85s cubic-bezier(0.35, 0, 0.2, 1) both;
+}
+
+/* Thành công — mặt trăng sáng lên */
+.phase-signal .mini-rocket-wrap {
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.phase-signal .moon-surface {
+  animation: successPulse 0.7s ease both;
+}
+.phase-signal .moon-star {
+  opacity: 0;
+}
+.phase-signal .moon-check {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.moon-check {
+  position: absolute;
+  left: 50%;
+  top: 47%;
+  z-index: 5;
+  transform: translate(-50%, -50%) scale(0.4);
+  opacity: 0;
+  color: #1a3d2e;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-shadow: 0 0 12px #6de0ca;
+  transition: opacity 0.2s, transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.moon-success-badge {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  z-index: 6;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border: 1px solid #6de0ca88;
+  border-radius: 999px;
+  color: #e8fff8;
+  background: #0d3d36ee;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 0 24px #6de0ca44;
+  animation: badgePop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@keyframes miniShake {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-3deg) translateY(1px); }
+  50% { transform: rotate(3deg) translateY(-1px); }
+  75% { transform: rotate(-2deg) translateY(1px); }
+}
+@keyframes miniAscent {
+  0%   { transform: rotate(0deg) translateY(0) scale(1); }
+  60%  { transform: rotate(-25deg) translateY(-38px) scale(1.05); }
+  100% { transform: rotate(-40deg) translateY(-52px) scale(1); }
+}
+/* Bay vòng quanh tâm nút submit — radius ~90px */
+@keyframes miniOrbit {
+  0%   { transform: rotate(-40deg) translateY(-52px) rotate(40deg); }
+  100% { transform: rotate(320deg) translateY(-52px) rotate(-320deg); }
+}
+@keyframes miniReturn {
+  0%   { transform: rotate(40deg) translateY(-52px) rotate(-40deg) scale(1); }
+  55%  { transform: rotate(10deg) translateY(-28px) rotate(-10deg) scale(1.04); }
+  100% { transform: rotate(0deg) translateY(0) scale(0.7) ; opacity: 0.85; }
+}
+@keyframes sparkBurst {
+  0%   { transform: scale(0.4); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+@keyframes sparkOrbit {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes successPulse {
+  0%   { box-shadow: inset -26px -18px 39px #484b5b8f, inset 15px 13px 25px #fff, 0 0 32px #b9c1ff6b; }
+  45%  { box-shadow: inset -26px -18px 39px #484b5b8f, inset 15px 13px 25px #fff, 0 0 70px #6de0cacc, 0 0 120px #6de0ca66; }
+  100% { box-shadow: inset -26px -18px 39px #484b5b8f, inset 15px 13px 25px #fff, 0 0 40px #6de0ca66; }
+}
+@keyframes badgePop {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px) scale(0.85); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+/* Sparks vị trí quanh quỹ đạo */
+.mini-sparks i:nth-child(1) { transform: translate(-48px, -20px); }
+.mini-sparks i:nth-child(2) { transform: translate(42px, -28px); }
+.mini-sparks i:nth-child(3) { transform: translate(38px, 30px); }
+.mini-sparks i:nth-child(4) { transform: translate(-44px, 24px); }
+.mini-sparks i:nth-child(5) { transform: translate(0, -58px); }
+.mini-sparks i:nth-child(6) { transform: translate(-56px, 0); }
+.mini-sparks i:nth-child(7) { transform: translate(52px, 4px); }
+.mini-sparks i:nth-child(8) { transform: translate(6px, 52px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .mini-rocket-wrap, .mini-sparks, .moon-success-badge, .moon-check {
+    animation: none !important;
+  }
+}
+
+/* ----- Giant moon backdrop + void cursor ----- */
+.giant-moon-layer {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.giant-moon {
+  position: absolute;
+  right: -12vw;
+  top: 8vh;
+  width: min(72vw, 820px);
+  aspect-ratio: 1;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.3, 1);
+  will-change: transform;
+}
+.giant-halo {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #8aa0ff18 0%, #5a6a9914 30%, transparent 62%);
+  filter: blur(8px);
+  animation: haloBreathe 7s ease-in-out infinite;
+}
+@keyframes haloBreathe {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.03); }
+}
+/* Mặt trăng TỐI — không lấn chữ trắng */
+.giant-disk {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 32% 28%, #8a8f9c 0%, #5c6270 22%, #3a4050 48%, #242a3a 72%, #151a28 100%);
+  box-shadow:
+    inset -40px -30px 80px #050a18ee,
+    inset 20px 14px 40px #a0a8b818,
+    0 0 60px #3a456618;
+}
+.giant-earthshine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 85% 70%, #2a3a5a44 0%, transparent 45%);
+  mix-blend-mode: multiply;
+}
+.giant-terminator {
+  position: absolute;
+  inset: -5% -25% -5% 35%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 25% 50%, #050a1855 0%, #03050fdd 75%);
+}
+.giant-spec {
+  position: absolute;
+  left: 12%;
+  top: 10%;
+  width: 35%;
+  height: 22%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffffff12, transparent);
+  filter: blur(8px);
+  transform: rotate(-30deg);
+}
+.g-crater {
+  position: absolute;
+  border-radius: 50%;
+  background: #2a3040;
+  box-shadow:
+    inset 2px 3px 6px #0a0e18aa,
+    -1px -1px 3px #6a728833;
+}
+.g-crater.g1 { width: 12%; height: 10%; left: 22%; top: 30%; }
+.g-crater.g2 { width: 7%; height: 6%; left: 40%; top: 18%; }
+.g-crater.g3 { width: 9%; height: 8%; left: 55%; top: 42%; }
+.g-crater.g4 { width: 5%; height: 5%; left: 30%; top: 55%; }
+.g-crater.g5 { width: 6%; height: 5%; left: 48%; top: 62%; }
+.g-crater.g6 { width: 4%; height: 4%; left: 62%; top: 28%; }
+.g-crater.g7 { width: 8%; height: 7%; left: 18%; top: 48%; }
+.g-mare {
+  position: absolute;
+  border-radius: 50%;
+  background: #1c223388;
+  filter: blur(2px);
+}
+.g-mare.m1 { width: 28%; height: 22%; left: 28%; top: 35%; }
+.g-mare.m2 { width: 18%; height: 16%; left: 52%; top: 55%; }
+.g-mare.m3 { width: 14%; height: 12%; left: 45%; top: 20%; }
+
+/* Cờ Việt Nam trên mặt trăng */
+.vn-flag-pole {
+  position: absolute;
+  left: 62%;
+  top: 18%;
+  width: 8%;
+  height: 34%;
+  z-index: 3;
+}
+.vn-flag-pole-line {
+  position: absolute;
+  left: 12%;
+  top: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(#9aa3b8, #4a5368);
+  border-radius: 2px;
+  box-shadow: 0 0 4px #00000066;
+}
+.vn-flag {
+  position: absolute;
+  left: 18%;
+  top: 4%;
+  width: 160%;
+  aspect-ratio: 3 / 2;
+  transform-origin: left center;
+  animation: flagWave 1.6s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px #00000066);
+}
+.vn-flag-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+@keyframes flagWave {
+  0%, 100% { transform: skewY(0deg) scaleX(1); }
+  50% { transform: skewY(-4deg) scaleX(0.94); }
+}
+.vn-flag-base {
+  position: absolute;
+  left: 0;
+  bottom: -4%;
+  width: 220%;
+  height: 10%;
+  border-radius: 50%;
+  background: #1a2030;
+  box-shadow: 0 1px 3px #00000088;
+}
+
+/* Người trên mặt trăng */
+.moon-folk {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.folk {
+  position: absolute;
+  width: 9%;
+  min-width: 36px;
+  filter: drop-shadow(0 1px 2px #00000088);
+}
+.folk-run {
+  left: 18%;
+  top: 48%;
+  animation: folkRun 1.1s ease-in-out infinite;
+}
+.folk-jump {
+  left: 38%;
+  top: 36%;
+  width: 10%;
+  animation: folkJump 0.9s ease-in-out infinite;
+}
+.folk-dance {
+  left: 52%;
+  top: 56%;
+  animation: folkDance 1.3s ease-in-out infinite;
+}
+.folk-wave {
+  left: 28%;
+  top: 62%;
+  width: 8%;
+  min-width: 30px;
+  animation: folkWave 1.5s ease-in-out infinite;
+}
+@keyframes folkRun {
+  0%, 100% { transform: translateY(0) rotate(-6deg); }
+  50% { transform: translateY(-6%) rotate(4deg); }
+}
+@keyframes folkJump {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-14%) scale(1.05); }
+  60% { transform: translateY(-12%) scale(1.02); }
+}
+@keyframes folkDance {
+  0%, 100% { transform: rotate(-8deg) translateY(0); }
+  50% { transform: rotate(8deg) translateY(-4%); }
+}
+@keyframes folkWave {
+  0%, 100% { transform: translateY(0) rotate(3deg); }
+  50% { transform: translateY(-5%) rotate(-5deg); }
+}
+
+.giant-orbit-ring {
+  position: absolute;
+  right: -8vw;
+  top: 18vh;
+  width: min(90vw, 1040px);
+  height: min(28vw, 280px);
+  border: 1px solid #8b9dff22;
+  border-radius: 50%;
+  transform: rotate(-18deg);
+  box-shadow: 0 0 30px #6d7ee011;
+}
+
+/* Void cursor — chỉ hiện ở vùng trống */
+.void-cursor-layer {
+  position: fixed;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.void-cursor-layer.is-active {
+  opacity: 1;
+}
+.void-aura {
+  position: absolute;
+  width: 0;
+  height: 0;
+  transform: translate(-50%, -50%);
+}
+.void-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #c8d4ff 45%, #7a8fff 100%);
+  box-shadow:
+    0 0 18px #aab8ffcc,
+    0 0 42px #6d7ee066,
+    0 0 80px #4a5fd433;
+}
+.void-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border: 1px solid #aab8ff55;
+  border-radius: 50%;
+  animation: voidPulse 2.2s ease-out infinite;
+}
+.void-ring.ring-b {
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+  border-color: #7ce5ed33;
+  animation-delay: 0.6s;
+}
+@keyframes voidPulse {
+  0% { transform: scale(0.55); opacity: 0.9; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+.void-crescent {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -34px 0 0 4px;
+  border-radius: 50%;
+  box-shadow: 6px 4px 0 0 #e8eeff;
+  opacity: 0.55;
+  animation: crescentSpin 10s linear infinite;
+}
+@keyframes crescentSpin {
+  to { transform: rotate(360deg); }
+}
+.void-spark {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 8px currentColor;
+  animation: sparkFade 0.7s ease-out forwards;
+}
+@keyframes sparkFade {
+  0% { opacity: 0.95; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.2); }
+}
+
+@media (max-width: 700px) {
+  .giant-moon {
+    width: min(95vw, 420px);
+    right: -20vw;
+    top: 4vh;
+  }
+  .void-crescent { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .giant-halo, .void-ring, .void-crescent, .void-spark {
+    animation: none !important;
+  }
+}
+
+/* ----- Rocket launch (cosmic) ----- */
+.rocket-stage {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 110%, #1a1040 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 20% 20%, #24306d99 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 30%, #3a1d5e88 0%, transparent 50%),
+    #03050f;
+  animation: stageIn 0.45s ease both;
+}
+.rocket-stage.is-signal {
+  animation: stageOut 0.9s ease 0.35s both;
+}
+@keyframes stageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes stageOut {
+  to { opacity: 0; }
+}
+
+.cosmos {
+  position: absolute;
+  inset: 0;
+}
+.cosmo-star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px #cfd7ff;
+  animation: twinkle 3s ease-in-out infinite alternate;
+}
+.cosmo-nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.35;
+  mix-blend-mode: screen;
+}
+.nebula-a {
+  width: 55vw;
+  height: 55vw;
+  left: -15vw;
+  top: -10vh;
+  background: #6b4dff;
+}
+.nebula-b {
+  width: 45vw;
+  height: 45vw;
+  right: -12vw;
+  top: 20vh;
+  background: #00c2ff;
+  opacity: 0.22;
+}
+.nebula-c {
+  width: 60vw;
+  height: 40vw;
+  left: 20vw;
+  bottom: -15vh;
+  background: #ff2a6d;
+  opacity: 0.18;
+}
+
+.planet {
+  position: absolute;
+  left: 58%;
+  top: 28%;
+  width: min(28vw, 280px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #8fd3ff 0%, #3d6fd4 35%, #1a2a6c 70%, #0a1235 100%);
+  box-shadow:
+    inset -30px -20px 50px #050a20aa,
+    0 0 60px #4d7fff66,
+    0 0 120px #2a4dff33;
+}
+.planet-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 170%;
+  height: 36%;
+  border: 3px solid #c4b5fd66;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-22deg);
+  box-shadow: 0 0 20px #a78bfa55;
+}
+.planet-glow {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #6ea8ff22 0%, transparent 70%);
+}
+
+.orbit-track {
+  position: absolute;
+  left: 58%;
+  top: 28%;
+  border: 1px dashed #8b9dff44;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.track-wide {
+  width: min(95vw, 920px);
+  height: min(55vw, 420px);
+  transform: translate(-50%, -50%) rotate(-18deg);
+}
+.track-mid {
+  width: min(70vw, 680px);
+  height: min(40vw, 320px);
+  transform: translate(-50%, -50%) rotate(12deg);
+  border-color: #7ce5ed33;
+}
+
+.launch-pad {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  transform: translateX(-50%);
+}
+.pad-moon {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fffdeb, #a5a9ae 55%, #6a6f80);
+  box-shadow: 0 0 30px #b9c1ff55, 0 10px 28px #0008;
+}
+.pad-crater {
+  position: absolute;
+  border-radius: 50%;
+  background: #8d929f88;
+  box-shadow: inset 2px 2px 4px #555a;
+}
+.pad-crater.c1 { width: 14px; height: 11px; left: 14px; top: 22px; }
+.pad-crater.c2 { width: 10px; height: 10px; right: 16px; top: 16px; }
+.pad-crater.c3 { width: 12px; height: 9px; right: 18px; bottom: 16px; }
+
+/* Đường bay tên lửa */
+.rocket-path {
+  position: absolute;
+  inset: 0;
+}
+.rocket-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  width: 56px;
+  height: 110px;
+  margin-left: -28px;
+  transform-origin: 50% 55%;
+}
+
+.is-ignition .rocket-wrap {
+  animation: igniteShake 0.45s ease both;
+}
+.is-ascent .rocket-wrap {
+  animation: ascentArc 1.4s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+.is-orbit .rocket-wrap {
+  animation: orbitLoop 2.8s linear infinite;
+}
+.is-reentry .rocket-wrap {
+  animation: reentryDrop 1.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.is-signal .rocket-wrap {
+  animation: landed 0.6s ease both;
+}
+
+@keyframes igniteShake {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(-3px, 1px) rotate(-2deg); }
+  50% { transform: translate(3px, -1px) rotate(2deg); }
+  75% { transform: translate(-2px, 2px) rotate(-1deg); }
+}
+@keyframes ascentArc {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  35%  { transform: translate(8vw, -35vh) rotate(18deg) scale(1.05); }
+  70%  { transform: translate(-12vw, -55vh) rotate(-25deg) scale(1); }
+  100% { transform: translate(10vw, -42vh) rotate(12deg) scale(0.95); }
+}
+/* Bay vòng vòng quanh hành tinh — tầm vũ trụ */
+@keyframes orbitLoop {
+  0%   { transform: translate(0, -42vh) rotate(0deg); }
+  12.5% { transform: translate(22vw, -48vh) rotate(45deg); }
+  25%  { transform: translate(32vw, -28vh) rotate(90deg); }
+  37.5% { transform: translate(22vw, -8vh) rotate(135deg); }
+  50%  { transform: translate(0, -2vh) rotate(180deg); }
+  62.5% { transform: translate(-22vw, -8vh) rotate(225deg); }
+  75%  { transform: translate(-32vw, -28vh) rotate(270deg); }
+  87.5% { transform: translate(-22vw, -48vh) rotate(315deg); }
+  100% { transform: translate(0, -42vh) rotate(360deg); }
+}
+@keyframes reentryDrop {
+  0%   { transform: translate(24vw, -40vh) rotate(40deg) scale(1); }
+  35%  { transform: translate(4vw, -18vh) rotate(-30deg) scale(1.08); }
+  70%  { transform: translate(0, -4vh) rotate(6deg) scale(0.95); }
+  100% { transform: translate(0, 2vh) rotate(0deg) scale(0.75); }
+}
+@keyframes landed {
+  0% { transform: translate(0, 2vh) scale(0.75); opacity: 1; }
+  60% { transform: translate(0, 0) scale(0.55); opacity: 0.5; }
+  100% { transform: translate(0, -2vh) scale(0.3); opacity: 0; }
+}
+
+.rocket {
+  position: relative;
+  width: 56px;
+  height: 110px;
+}
+.rocket-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 12px #8ab4ff88);
+}
+.is-orbit .rocket-svg,
+.is-ascent .rocket-svg,
+.is-ignition .rocket-svg,
+.is-reentry .rocket-svg {
+  filter: drop-shadow(0 0 18px #7ce5edaa);
+}
+
+/* Lửa phụt */
+.flame {
+  transform-origin: 32px 95px;
+  animation: flameFlicker 0.12s ease-in-out infinite alternate;
+}
+.is-signal .flame {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+@keyframes flameFlicker {
+  from { transform: scaleY(1) scaleX(1); opacity: 1; }
+  to   { transform: scaleY(1.35) scaleX(0.85); opacity: 0.85; }
+}
+
+.exhaust {
+  position: absolute;
+  left: 50%;
+  top: 92%;
+  width: 40px;
+  height: 80px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.exhaust i {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: #ffb347;
+  box-shadow: 0 0 10px #ff5a1f, 0 0 18px #ff2a6d;
+  animation: exhaustTrail 0.55s linear infinite;
+}
+.exhaust i:nth-child(1) { --dx: -4px; animation-delay: 0s; background: #fff3b0; }
+.exhaust i:nth-child(2) { --dx: 5px; animation-delay: 0.08s; width: 5px; height: 5px; }
+.exhaust i:nth-child(3) { --dx: -7px; animation-delay: 0.16s; background: #ff8c42; }
+.exhaust i:nth-child(4) { --dx: 3px; animation-delay: 0.24s; width: 4px; height: 4px; background: #ff2a6d; }
+.exhaust i:nth-child(5) { --dx: -2px; animation-delay: 0.32s; width: 7px; height: 7px; }
+.exhaust i:nth-child(6) { --dx: 6px; animation-delay: 0.4s; width: 3px; height: 3px; background: #7ce5ed; }
+@keyframes exhaustTrail {
+  0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx, 0), 55px) scale(0.2); opacity: 0; }
+}
+
+.spark-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.spark {
+  position: absolute;
+  bottom: 18%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffd27a;
+  box-shadow: 0 0 8px #ff8c42;
+  opacity: 0;
+  animation: sparkRise 1.4s ease-out infinite;
+}
+.is-orbit .spark,
+.is-ascent .spark,
+.is-ignition .spark,
+.is-reentry .spark {
+  opacity: 1;
+}
+@keyframes sparkRise {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0.9; }
+  100% { transform: translate(var(--sx, 10px), -55vh) scale(0.3); opacity: 0; }
+}
+.spark:nth-child(odd) { --sx: -30px; }
+.spark:nth-child(3n)  { --sx: 40px; }
+.spark:nth-child(4n)  { --sx: -15px; width: 2px; height: 2px; }
+
+.rocket-caption {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 1px solid #8b9dff55;
+  border-radius: 999px;
+  color: #dce4ff;
+  background: #0a1030cc;
+  font: 500 0.78rem 'DM Mono', monospace;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+.caption-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7ce5ed;
+  box-shadow: 0 0 10px #7ce5ed;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.signal-badge {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 36px;
+  border: 1px solid #6de0ca88;
+  border-radius: 22px;
+  color: #e8fff8;
+  background: linear-gradient(135deg, #0d3d36ee, #0a1030ee);
+  box-shadow: 0 0 50px #6de0ca44, 0 20px 60px #0008;
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  animation: signalPop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.signal-check {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #06251f;
+  background: #6de0ca;
+  font-weight: 700;
+  box-shadow: 0 0 20px #6de0ca;
+}
+@keyframes signalPop {
+  from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.moon-zone.is-launching .moon-surface {
+  animation: moonPulse 1s ease-in-out infinite;
+  box-shadow: inset -26px -18px 39px #484b5b8f, inset 15px 13px 25px #fff, 0 0 70px #ffb34788, 0 14px 38px #020411ad;
+}
+.moon-zone.is-launching .orbit {
+  border-color: #ffb34766;
+  box-shadow: 0 0 28px #ff5a1f33;
+}
+
+.result-signal {
+  animation: resultLanded 0.6s ease both;
+}
+@keyframes resultLanded {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (max-width: 700px) {
+  .planet {
+    width: min(42vw, 180px);
+    left: 55%;
+    top: 22%;
+  }
+  .track-wide {
+    width: 120vw;
+    height: 55vw;
+  }
+  .track-mid {
+    width: 90vw;
+    height: 40vw;
+  }
+  .signal-badge {
+    font-size: 1.05rem;
+    padding: 16px 22px;
+  }
+  .rocket-caption {
+    font-size: 0.68rem;
+    max-width: 90vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rocket-stage,
+  .rocket-stage * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ===== Đội tên lửa quanh nút + background ===== */
+.launch-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 1px dashed #8b9dff44;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+.launch-ring.ring-a {
+  width: 160px;
+  height: 160px;
+}
+.launch-ring.ring-b {
+  width: 230px;
+  height: 230px;
+}
+.is-launching .launch-ring {
+  opacity: 1;
+  animation: ringPulse 1.8s ease-in-out infinite;
+}
+.is-launching .launch-ring.ring-b {
+  animation-delay: 0.4s;
+}
+@keyframes ringPulse {
+  0%, 100% { opacity: 0.25; transform: translate(-50%, -50%) scale(0.92); }
+  50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.rocket-fleet {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+.fleet-rocket {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+}
+.fleet-rocket-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 10px #8ab4ffaa);
+}
+.fleet-rocket-inner svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.fleet-flame {
+  transform-origin: 20px 62px;
+  animation: flameFlicker 0.11s ease-in-out infinite alternate;
+}
+.trail {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  width: 4px;
+  height: 18px;
+  margin-left: -2px;
+  border-radius: 4px;
+  background: linear-gradient(#ffb347, transparent);
+  opacity: 0;
+}
+
+/* Cất cánh từ tâm mặt trăng */
+.phase-ignition .fleet-rocket {
+  opacity: 1;
+  animation: fleetIgnite 0.5s ease both;
+}
+.phase-ignition .trail {
+  opacity: 0.85;
+  animation: trailFlicker 0.2s linear infinite;
+}
+.phase-ascent .fleet-rocket {
+  opacity: 1;
+  animation: fleetAscent 0.85s cubic-bezier(0.15, 0.75, 0.3, 1) both;
+}
+.phase-ascent .trail {
+  opacity: 1;
+  animation: trailFlicker 0.15s linear infinite;
+}
+
+/* Bay vòng — mỗi tên lửa 1 quỹ đạo */
+.phase-orbit .fleet-rocket {
+  opacity: 1;
+}
+.phase-orbit .rocket-1 { animation: fleetOrbit 1.7s linear infinite; animation-delay: var(--delay); }
+.phase-orbit .rocket-2 { animation: fleetOrbitAlt 2.1s linear infinite; animation-delay: var(--delay); }
+.phase-orbit .rocket-3 { animation: fleetOrbit 1.45s linear infinite reverse; animation-delay: var(--delay); }
+.phase-orbit .rocket-4 { animation: fleetOrbitAlt 2.4s linear infinite reverse; animation-delay: var(--delay); }
+.phase-orbit .trail {
+  opacity: 1;
+  animation: trailFlicker 0.15s linear infinite;
+}
+
+/* Về mặt trăng */
+.phase-reentry .fleet-rocket {
+  opacity: 1;
+  animation: fleetReturn 0.95s cubic-bezier(0.3, 0, 0.2, 1) both;
+}
+.phase-signal .fleet-rocket {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+@keyframes fleetIgnite {
+  0%   { transform: translate(-50%, -50%) scale(0.35); opacity: 0; }
+  40%  { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+  100% { transform: translate(-50%, -62%) scale(1); opacity: 1; }
+}
+@keyframes fleetAscent {
+  0%   { transform: translate(-50%, -62%) rotate(0deg) scale(1); }
+  50%  { transform: translate(calc(-50% + 18px), calc(-62% - 70px)) rotate(18deg) scale(1.05); }
+  100% { transform: translate(-50%, calc(-62% - 110px)) rotate(0deg) scale(1); }
+}
+@keyframes fleetOrbit {
+  0%   { transform: rotate(0deg) translateX(var(--radius, 80px)) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(var(--radius, 80px)) rotate(-360deg); }
+}
+@keyframes fleetOrbitAlt {
+  0%   { transform: rotate(90deg) translateX(var(--radius, 100px)) rotate(-90deg); }
+  100% { transform: rotate(450deg) translateX(var(--radius, 100px)) rotate(-450deg); }
+}
+@keyframes fleetReturn {
+  0%   { transform: rotate(200deg) translateX(var(--radius, 80px)) rotate(-200deg) scale(1); }
+  55%  { transform: rotate(320deg) translateX(calc(var(--radius, 80px) * 0.4)) rotate(-320deg) scale(1.02); }
+  100% { transform: translate(-50%, -50%) rotate(0deg) scale(0.35); opacity: 0.7; }
+}
+@keyframes trailFlicker {
+  0%   { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1.4); opacity: 0.55; }
+}
+
+.moon-orbit-caption {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: #cfd6ff;
+  background: #121934cc;
+  border: 1px solid #8b9dff44;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  animation: badgePop 0.35s ease both;
+}
+
+/* ===== Background rockets ===== */
+.bg-rockets {
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.bg-rockets.is-active {
+  opacity: 1;
+}
+.bg-ship {
+  position: absolute;
+  left: -12%;
+  width: 56px;
+  height: 32px;
+  animation-name: bgFlyLTR;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+.bg-ship.rtl {
+  left: auto;
+  right: -12%;
+  animation-name: bgFlyRTL;
+}
+.bg-ship-body {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 12px #8ab4ff66);
+}
+.bg-ship-body svg {
+  width: 100%;
+  height: 100%;
+}
+.bg-trail {
+  position: absolute;
+  top: 50%;
+  right: -40px;
+  width: 48px;
+  height: 3px;
+  margin-top: -1.5px;
+  background: linear-gradient(90deg, #ffb34788, transparent);
+  border-radius: 2px;
+}
+.bg-ship.rtl .bg-trail {
+  right: auto;
+  left: -40px;
+  background: linear-gradient(270deg, #ffb34788, transparent);
+}
+
+@keyframes bgFlyLTR {
+  0%   { transform: translateX(0) scale(var(--s, 0.6)); opacity: 0; }
+  8%   { opacity: 0.85; }
+  92%  { opacity: 0.85; }
+  100% { transform: translateX(112vw) scale(var(--s, 0.6)); opacity: 0; }
+}
+@keyframes bgFlyRTL {
+  0%   { transform: translateX(0) scale(var(--s, 0.6)); opacity: 0; }
+  8%   { opacity: 0.75; }
+  92%  { opacity: 0.75; }
+  100% { transform: translateX(-112vw) scale(var(--s, 0.6)); opacity: 0; }
+}
+
+/* Bay vòng quanh mặt trăng lớn (phải trên) */
+.bg-moon-orbit {
+  position: absolute;
+  right: -6vw;
+  top: 10vh;
+  width: min(70vw, 780px);
+  height: min(70vw, 780px);
+  animation: none;
+}
+.bg-moon-ship {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 36px;
+  height: 64px;
+  margin: -32px 0 0 -18px;
+  opacity: 0.75;
+}
+.bg-moon-ship svg {
+  width: 100%;
+  height: 100%;
+}
+.bg-moon-ship.ship-a {
+  animation: moonOrbitA 3.2s linear infinite;
+}
+.bg-moon-ship.ship-b {
+  animation: moonOrbitB 4.2s linear infinite;
+}
+@keyframes moonOrbitA {
+  0%   { transform: rotate(0deg) translateX(min(32vw, 340px)) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(min(32vw, 340px)) rotate(-360deg); }
+}
+@keyframes moonOrbitB {
+  0%   { transform: rotate(160deg) translateX(min(26vw, 280px)) rotate(-160deg); }
+  100% { transform: rotate(520deg) translateX(min(26vw, 280px)) rotate(-520deg); }
+}
+
+@media (max-width: 700px) {
+  .bg-ship { width: 40px; height: 22px; }
+  .bg-moon-ship { width: 26px; height: 46px; margin: -23px 0 0 -13px; }
+}

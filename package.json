@@ -1,0 +1,23 @@
+{
+  "name": "moonlink",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"node --watch server/index.js\" \"vite --host 127.0.0.1\"",
+    "dev:server": "node --watch server/index.js",
+    "dev:client": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "start": "node server/index.js",
+    "check": "node --check server/index.js && node --check server/db.js && node --check server/services/link-service.js && node --check server/services/auth-service.js && node --check server/services/affiliate-provider.js && node --check server/services/conversion-service.js && node --check server/services/env.js && node --check server/services/url-service.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "vue": "^3.5.22"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
+    "concurrently": "^9.2.1",
+    "vite": "^7.1.7"
+  }
+}
