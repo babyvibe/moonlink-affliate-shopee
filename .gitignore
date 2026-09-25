@@ -4,3 +4,4 @@ dist/
 data/*.sqlite
 data/*.sqlite-*
 .env
+.idea/*
