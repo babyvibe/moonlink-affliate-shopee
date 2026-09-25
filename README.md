@@ -119,7 +119,7 @@ node -v   # cần v22.5+
 ### 2️⃣ Clone & cài dependency
 
 ```bash
-git clone https://github.com/<ban>/Cashback-Shopee.git
+git clone https://github.com/babyvibe/Cashback-Shopee.git
 cd Cashback-Shopee
 pnpm install
 ```
