@@ -3,6 +3,8 @@ import database from '../db.js'
 import { buildAnRedirLink, fetchProductData } from './affiliate-provider.js'
 import { config } from './env.js'
 import { withDbLog } from './logger.js'
+import { getSetting } from './settings-service.js'
+import { recordPriceSnapshot } from './watch-list-service.js'
 import { extractItemIds, normalizeShopeeUrl, stripTrackingParams } from './url-service.js'
 
 export function ensureSession(sessionId) {
@@ -27,8 +29,8 @@ export function ensureSession(sessionId) {
  * phí MCN chỉ trừ khi cấu hình MCN_FEE_PERCENT > 0.
  */
 export function calcCashbackFromProduct(product, options = {}) {
-  const sharePercent = options.cashbackSharePercent ?? config.cashbackSharePercent
-  const mcnFeePercent = options.mcnFeePercent ?? config.mcnFeePercent
+  const sharePercent = options.cashbackSharePercent ?? Number(getSetting('cashback_share_percent'))
+  const mcnFeePercent = options.mcnFeePercent ?? Number(getSetting('mcn_fee_percent'))
 
   const sellerComFinal = product?.sellerComFinal != null ? Math.round(Number(product.sellerComFinal)) : null
   const shopeeComFinal = product?.shopeeComFinal != null ? Math.round(Number(product.shopeeComFinal)) : null
@@ -77,8 +79,8 @@ export function calcCashbackFromProduct(product, options = {}) {
 
 function toPublicLink(row) {
   const commissionEstimate = row.commissionEstimate ?? null
-  const cashbackSharePercent = config.cashbackSharePercent
-  const mcnFeePercent = config.mcnFeePercent
+  const cashbackSharePercent = Number(getSetting('cashback_share_percent'))
+  const mcnFeePercent = Number(getSetting('mcn_fee_percent'))
   const mcnFee = mcnFeePercent > 0 && commissionEstimate != null
     ? Math.floor(Number(commissionEstimate) * mcnFeePercent / 100)
     : 0
@@ -145,10 +147,11 @@ export async function generateLink({ sessionId, url, subIds = [] }) {
       || (ids.itemId ? `https://shopee.vn/product/${ids.shopId || '0'}/${ids.itemId}` : null)
 
     const cleanOrigin = originLink ? stripTrackingParams(originLink) : null
+    const affiliateId = getSetting('shopee_affiliate_id')
     const affiliateUrl = lookup.affLink
       || buildAnRedirLink({
         originLink: cleanOrigin,
-        affiliateId: config.shopeeAffiliateId,
+        affiliateId,
         subIds,
       })
 
@@ -185,9 +188,9 @@ export async function generateLink({ sessionId, url, subIds = [] }) {
 
     if (!affiliateUrl) {
       throw new Error(
-        config.shopeeAffiliateId
+        affiliateId
           ? 'API chưa trả về link affiliate hợp lệ cho sản phẩm này.'
-          : 'Chưa cấu hình SHOPEE_AFFILIATE_ID nên không tạo được link theo dõi.'
+          : 'Chưa cấu hình Affiliate ID (Admin → Cài đặt hoặc .env).'
       )
     }
 
@@ -236,6 +239,18 @@ export async function generateLink({ sessionId, url, subIds = [] }) {
       { sessionId: session }
     )
 
+    // Snapshot giá cho “Đã xem” — docs/06
+    try {
+      recordPriceSnapshot({
+        itemId: link.itemId,
+        price: link.productPrice,
+        commissionEstimate: link.commissionEstimate,
+        source: 'lookup',
+      })
+    } catch {
+      // không làm hỏng luồng chính
+    }
+
     return {
       ...toPublicLink(link),
       sellerComFinal: partial.sellerComFinal,
@@ -243,8 +258,8 @@ export async function generateLink({ sessionId, url, subIds = [] }) {
       mcnFee: partial._calc?.mcnFee ?? 0,
       commissionNet: partial._calc?.commissionNet ?? null,
       cashbackEstimate: partial._calc?.cashbackEstimate ?? null,
-      cashbackSharePercent: partial._calc?.cashbackSharePercent ?? config.cashbackSharePercent,
-      mcnFeePercent: partial._calc?.mcnFeePercent ?? config.mcnFeePercent,
+      cashbackSharePercent: partial._calc?.cashbackSharePercent ?? Number(getSetting('cashback_share_percent')),
+      mcnFeePercent: partial._calc?.mcnFeePercent ?? Number(getSetting('mcn_fee_percent')),
       cashbackFormula: partial._calc?.formula ?? null,
       warning: lookup.warning || null,
     }

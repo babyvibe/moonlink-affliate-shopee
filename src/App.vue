@@ -8,6 +8,9 @@ import MoonButton from './components/MoonButton.vue'
 import LinkResultCard from './components/LinkResultCard.vue'
 import RecentLinks from './components/RecentLinks.vue'
 import BackgroundRockets from './components/BackgroundRockets.vue'
+import BatchLookupPage from './views/BatchLookupPage.vue'
+import ExplorePage from './views/ExplorePage.vue'
+import MarketPage from './views/MarketPage.vue'
 import AdminLoginPage from './admin/AdminLoginPage.vue'
 import AdminReportsPage from './admin/AdminReportsPage.vue'
 import { api } from './services/api.js'
@@ -31,6 +34,13 @@ const adminChecked = ref(false)
 const isAdminArea = computed(() => route.value.startsWith('/admin'))
 const showReports = computed(() => isAdminArea.value && adminUser.value)
 const showLogin = computed(() => isAdminArea.value && adminChecked.value && !adminUser.value)
+const pageKind = computed(() => {
+  if (isAdminArea.value) return 'admin'
+  if (route.value.startsWith('/batch')) return 'batch'
+  if (route.value.startsWith('/explore')) return 'explore'
+  if (route.value.startsWith('/market')) return 'market'
+  return 'home'
+})
 
 /** Validate live khi gõ / dán — chặn ngay trên UI */
 const linkCheck = computed(() => parseShopeeUrl(url.value))
@@ -171,9 +181,25 @@ function reset() {
 
 async function loadRecent() {
   try {
-    recentLinks.value = (await api.getRecentLinks()).links
+    const result = await api.watchlist(20)
+    recentLinks.value = (result.items || []).map((item) => ({
+      id: item.id,
+      productName: item.productName,
+      shopName: item.shopName,
+      inputUrl: item.originUrl,
+      affiliateUrl: item.affiliateUrl,
+      cashbackEstimate: item.currentCashback,
+      productPrice: item.currentPrice,
+      priceDelta: item.priceDelta,
+      cashbackDelta: item.cashbackDelta,
+      createdAt: item.createdAt,
+    }))
   } catch {
-    /* history is supplementary */
+    try {
+      recentLinks.value = (await api.getRecentLinks()).links
+    } catch {
+      /* history is supplementary */
+    }
   }
 }
 
@@ -207,6 +233,19 @@ function onLogout() {
   route.value = '/admin'
 }
 
+function goConvert(e) {
+  if (e) e.preventDefault()
+  const isHome = route.value === '/' || route.value === '' || route.value === '/home'
+  if (!isHome) {
+    window.location.hash = '#/'
+    route.value = '/'
+  }
+  requestAnimationFrame(() => {
+    document.querySelector('.launcher')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    window.setTimeout(() => document.querySelector('#shopee-link')?.focus(), 350)
+  })
+}
+
 onMounted(async () => {
   window.addEventListener('hashchange', syncRoute)
   await Promise.all([loadRecent(), checkAdmin()])
@@ -226,18 +265,43 @@ onMounted(async () => {
         </a>
         <nav aria-label="Điều hướng chính">
           <template v-if="!isAdminArea">
+            <a href="#tools">Công cụ</a>
             <a href="#how">Cách dùng</a>
             <a href="#recent">Đã xem</a>
+            <a href="#/admin">Đăng nhập quản trị</a>
           </template>
           <template v-else>
             <a href="#/">Về trang chủ</a>
           </template>
         </nav>
-        <span class="header-status"><i /> ONLINE</span>
       </header>
 
       <!-- Public -->
-      <template v-if="!isAdminArea">
+      <template v-if="pageKind === 'batch'">
+        <BatchLookupPage />
+        <footer>
+          <span>MOONLINK</span>
+          <span><a href="#/">Về trang chủ</a> · <a href="#/admin">Đăng nhập quản trị</a></span>
+        </footer>
+      </template>
+
+      <template v-else-if="pageKind === 'explore'">
+        <ExplorePage />
+        <footer>
+          <span>MOONLINK</span>
+          <span><a href="#/">Về trang chủ</a> · <a href="#/admin">Đăng nhập quản trị</a></span>
+        </footer>
+      </template>
+
+      <template v-else-if="pageKind === 'market'">
+        <MarketPage />
+        <footer>
+          <span>MOONLINK</span>
+          <span><a href="#/">Về trang chủ</a> · <a href="#/admin">Đăng nhập quản trị</a></span>
+        </footer>
+      </template>
+
+      <template v-else-if="pageKind === 'home'">
         <section id="top" class="hero" aria-labelledby="hero-title">
           <p class="eyebrow"><span /> MOONLINK <span /></p>
           <h1 id="hero-title">Mua Shopee. <em>Nhận tiền hoàn.</em></h1>
@@ -282,6 +346,50 @@ onMounted(async () => {
             </article>
           </div>
         </section>
+
+        <!-- Landing: các công cụ khác (không tách menu) -->
+        <section id="tools" class="tools-section" aria-labelledby="tools-title">
+          <p class="section-kicker">Công cụ</p>
+          <h2 id="tools-title">Thêm công cụ cho người làm affiliate</h2>
+          <div class="tool-cards">
+            <a class="tool-card" href="#/" @click="goConvert">
+              <span class="tool-icon">📈</span>
+              <h3>Giá &amp; so sánh</h3>
+              <p>Chart giá 7/30/90 ngày, so TikTok &amp; Lazada — ngay sau khi kiểm tra link.</p>
+            </a>
+            <a class="tool-card" href="#/batch">
+              <span class="tool-icon">⚡</span>
+              <h3>Tra nhanh</h3>
+              <p>Dán 100 link / ID một lúc — ra bảng tiền hoàn + link.</p>
+            </a>
+            <a class="tool-card" href="#/explore?tab=products">
+              <span class="tool-icon">🛍</span>
+              <h3>Sản phẩm</h3>
+              <p>Tìm sản phẩm hoa hồng cao theo từ khóa.</p>
+            </a>
+            <a class="tool-card" href="#/explore?tab=campaigns">
+              <span class="tool-icon">🎯</span>
+              <h3>Chiến dịch</h3>
+              <p>Chương trình KOL, brand đang chạy trên Shopee.</p>
+            </a>
+            <a class="tool-card" href="#/explore?tab=shops">
+              <span class="tool-icon">📡</span>
+              <h3>Shop đang live</h3>
+              <p>Biết shop nào đang phát trực tiếp, khung giờ hay live.</p>
+            </a>
+            <a class="tool-card" href="#/explore?tab=food">
+              <span class="tool-icon">🍜</span>
+              <h3>Quán ăn &amp; Đơn food</h3>
+              <p>Thông tin quán ShopeeFood, lịch sử đơn đã đặt (cần cookie).</p>
+            </a>
+            <a class="tool-card" href="#/market">
+              <span class="tool-icon">🌊</span>
+              <h3>Ngách</h3>
+              <p>Phân tích thị trường, cạnh tranh, so 2–3 từ khóa.</p>
+            </a>
+          </div>
+        </section>
+
         <div id="recent">
           <RecentLinks :links="recentLinks" @clear="clearRecent" />
         </div>

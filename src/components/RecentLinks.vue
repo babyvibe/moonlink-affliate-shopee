@@ -7,6 +7,13 @@ function formatPrice(value) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(value))
 }
 
+function deltaLabel(value) {
+  if (value == null) return ''
+  const n = Number(value)
+  if (n === 0) return ''
+  return n < 0 ? `↓ ${formatPrice(Math.abs(n))}` : `↑ ${formatPrice(n)}`
+}
+
 async function copy(url) {
   await navigator.clipboard.writeText(url)
 }
@@ -30,6 +37,9 @@ async function copy(url) {
             <template v-if="link.cashbackEstimate">Hoàn {{ formatPrice(link.cashbackEstimate) }}</template>
             <template v-else-if="link.commissionEstimate">Hoàn {{ formatPrice(Math.floor(Number(link.commissionEstimate) * (link.cashbackSharePercent ?? 70) / 100)) }}</template>
             <template v-else>—</template>
+            <template v-if="link.priceDelta != null && deltaLabel(link.priceDelta)">
+              · giá <span :class="link.priceDelta < 0 ? 'delta-down' : 'delta-up'">{{ deltaLabel(link.priceDelta) }}</span>
+            </template>
             · {{ new Date(link.createdAt).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }) }}
           </small>
         </div>

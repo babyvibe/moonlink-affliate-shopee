@@ -1,16 +1,22 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { api } from '../services/api.js'
+import AdminSettingsPage from './AdminSettingsPage.vue'
+import AdminShopAlerts from './AdminShopAlerts.vue'
+import AdminTunnelPage from './AdminTunnelPage.vue'
 
 const props = defineProps({
   user: { type: Object, required: true },
 })
 const emit = defineEmits(['logout'])
 
-/** 2 tab báo cáo */
+/** 4 tab: 2 báo cáo + cảnh báo HH + cài đặt */
 const TABS = [
   { id: 'links', label: 'Link hệ thống' },
   { id: 'conversions', label: 'Chuyển đổi' },
+  { id: 'alerts', label: 'Cảnh báo HH' },
+  { id: 'test', label: 'Kiểm thử' },
+  { id: 'settings', label: 'Cài đặt' },
 ]
 const activeTab = ref('links')
 
@@ -480,6 +486,21 @@ async function logout() {
           </button>
         </div>
       </section>
+    </div>
+
+    <!-- TAB: Kiểm thử API -->
+    <div v-show="activeTab === 'test'" role="tabpanel" class="report-panel">
+      <AdminTunnelPage />
+    </div>
+
+    <!-- TAB: Cảnh báo hoa hồng -->
+    <div v-show="activeTab === 'alerts'" role="tabpanel" class="report-panel">
+      <AdminShopAlerts />
+    </div>
+
+    <!-- TAB 3: Cài đặt -->
+    <div v-show="activeTab === 'settings'" role="tabpanel" class="report-panel">
+      <AdminSettingsPage />
     </div>
   </section>
 </template>

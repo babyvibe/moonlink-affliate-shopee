@@ -138,7 +138,7 @@ export function logDb({ op, params, elapsedMs, rowCount, sessionId, ok = true, m
 }
 
 /** Wrapper fetch cho outbound Addlivetag: tự đo thời gian + log */
-export async function fetchOutbound({ label, url, method = 'GET', headers = {}, query, sessionId, timeoutMs = 15_000 }) {
+export async function fetchOutbound({ label, url, method = 'GET', headers = {}, query, body, sessionId, timeoutMs = 15_000 }) {
   const startedAt = Date.now()
   let target = url
   try {
@@ -155,10 +155,11 @@ export async function fetchOutbound({ label, url, method = 'GET', headers = {}, 
     const response = await fetch(target, {
       method,
       headers: { Accept: 'application/json', ...headers },
+      body: body == null ? undefined : (typeof body === 'string' ? body : JSON.stringify(body)),
       signal: AbortSignal.timeout(timeoutMs),
     })
     const elapsedMs = Date.now() - startedAt
-    const body = await response.json().catch(() => null)
+    const json = await response.json().catch(() => null)
 
     logOutbound({
       label,
@@ -168,21 +169,21 @@ export async function fetchOutbound({ label, url, method = 'GET', headers = {}, 
       status: response.status,
       elapsedMs,
       ok: response.ok,
-      message: response.ok ? null : body?.message || body?.error || `HTTP ${response.status}`,
-      summary: body && typeof body === 'object'
+      message: response.ok ? null : json?.message || json?.error || `HTTP ${response.status}`,
+      summary: json && typeof json === 'object'
         ? {
-            ok: body.ok,
-            hasProduct: Boolean(body.productInfo || body.data?.productInfo),
-            hasAffLink: Boolean(body.affLink),
-            dataSource: body.productInfo?.dataSource || body.dataSource,
-            total: body.meta?.total,
-            dataCount: Array.isArray(body.data) ? body.data.length : undefined,
+            ok: json.ok,
+            hasProduct: Boolean(json.productInfo || json.data?.productInfo),
+            hasAffLink: Boolean(json.affLink),
+            dataSource: json.productInfo?.dataSource || json.dataSource,
+            total: json.meta?.total,
+            dataCount: Array.isArray(json.data) ? json.data.length : undefined,
           }
         : null,
       sessionId,
     })
 
-    return { response, body, elapsedMs, ok: response.ok }
+    return { response, body: json, elapsedMs, ok: response.ok }
   } catch (error) {
     const elapsedMs = Date.now() - startedAt
     logOutbound({

@@ -32,6 +32,8 @@ export const config = {
   addlivetagApiKey: process.env.ADDLIVETAG_API_KEY || '',
   productApiBase: process.env.PRODUCT_API_BASE || 'https://data.addlivetag.com/product-data/product-data.php',
   conversionsApiBase: process.env.CONVERSIONS_API_BASE || 'https://addlivetag.com/api/v1/conversions.php',
+  // Data API unofficial (product batch, history, offers, market…)
+  dataApiBase: process.env.DATA_API_BASE || 'https://data.addlivetag.com',
   shopeeAffiliateId: process.env.SHOPEE_AFFILIATE_ID || '',
   adminUsername: process.env.ADMIN_USERNAME || 'admin',
   adminPassword: process.env.ADMIN_PASSWORD || '',
@@ -50,4 +52,7 @@ export const config = {
   shopeeCapRaw: process.env.SHOPEE_CAP_RAW || '',
   // % phí MCN trừ khỏi hoa hồng trước khi chia cashback (0 = không trừ — theo PRODUCT-DESIGN)
   mcnFeePercent: Math.min(100, Math.max(0, Number(process.env.MCN_FEE_PERCENT || 0))),
+  // Cookie Shopee Affiliate (J2Team) — cho API cần cookie như shopeefood/orders.php
+  shopeeCookie: process.env.SHOPEE_COOKIE || '',
+  shopeefoodCookie: process.env.SHOOPEFOOD_COOKIE || process.env.SHOPEEFOOD_COOKIE || '',
 }

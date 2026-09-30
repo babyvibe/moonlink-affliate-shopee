@@ -30,6 +30,32 @@ Các trang Addlivetag là tài liệu của bên thứ ba. Những trang mô t�
 | [Conversion report](https://addlivetag.com/shopee-affiliate-api/conversion_report.php) và [Validation report](https://addlivetag.com/shopee-affiliate-api/validation_report.php) | Mô tả báo cáo chuyển đổi và xác thực với Sub ID | Nguồn bổ sung cần kiểm chứng cho đối soát |
 | [Product offers](https://addlivetag.com/shopee-affiliate-api/product_offer.php) | Mô tả tìm kiếm theo từ khóa/danh mục và sắp xếp ưu đãi | Nguồn bổ sung nếu làm trang khám phá |
 
+### Nguồn Data API unofficial (bổ sung 25/09/2026)
+
+Tài liệu tổng hợp: [bcat95/shopee-aff](https://github.com/bcat95/shopee-aff) — hệ **Data API** tại `data.addlivetag.com`, xác thực bằng **API key** (`X-API-Key`, bắt buộc từ 01/10/2026). Khác với Open API GraphQL (app_id + secret).
+
+| Endpoint unofficial | Dữ liệu trả về | Cache / quota | Khả năng sản phẩm |
+| --- | --- | --- | --- |
+| `product-data/product-data.php` | Giá, hoa hồng (seller/shopee), rating, `affLink` | 3h | Tra cứu SP + cashback (đang dùng) |
+| `product-data/product-data-batch.php` | Tối đa **100 SP/lần**; summary `fromCache/fromApi/stale/…` | 3h | Tra hàng loạt cho KOL |
+| `price-tracking/history.php` | Lịch sử **giá + hoa hồng** ≤50 SP, ≤730 ngày; `format=chart`; `isLowest/isHighest` | DB, không tốn quota Shopee | Biểu đồ giá, “giá tốt nhất” |
+| `search/market.php` | Thị trường theo từ khóa: doanh thu, shop, HHI, **blueOceanScore**, top SP growth | DB, TTL 6h | Chọn ngách / nội dung |
+| `offers/product-offer.php` · `shop-offer.php` · `shopee-offer.php` | SP/shop/campaign có hoa hồng, sort theo rate | 10–30 phút | Săn deal hoa hồng cao |
+| `offers/shop-products.php` · `shop-info.php` | SP của shop; profile shop (followers, official, response rate) | 10′ / 7 ngày | Đánh giá shop trước khi share |
+| `offers/shop-check.php` · `shop-changes.php` | Hoa hồng shop hiện tại + **đổi rate theo ngày** | 6h / DB | Cảnh báo giảm hoa hồng |
+| `tiktok/find-by-shopee.php` | SP giống trên TikTok + so giá/hoa hồng (`matchScore`) | 24h | So sàn chéo (arbitrage) |
+| `lazada/product.php` · `resolve.php` | SP Lazada | 24h | So sàn (sau) |
+| `shopeefood/store.php` · `orders.php` | Quán / đơn food (orders proxy cookie) | — | Ngoài MVP như mục 3 |
+| `live/shop-live.php` | Shop đang live | — | Sau |
+
+**Ràng buộc dùng chung (từ docs):**
+
+- Scope khuyến nghị *học tập / nội bộ phi thương mại* — public app phải đọc kỹ điều khoản Addlivetag.
+- Quota riêng theo IP; batch nên `cache_only=1` hoặc `max_api=10–20` khi quét lớn; cooldown 120s khi nguồn báo rate limit.
+- History nên truyền `base_rate` để **chuẩn hoá chuỗi hoa hồng** (tránh nhảy tier 3.5%/5%/8% trong data).
+- Market search: **không cộng** khối `market` (luỹ kế) với `last30Days` (chu kỳ); luôn hiện `scopeNote`.
+- Match TikTok là **suy đoán** (tên + giá) — chỉ dùng khi `matchConfidence=high`.
+
 REST conversion của Addlivetag dùng dữ liệu đã đồng bộ từ tài khoản affiliate kết nối bằng cookie; xác thực bằng API key, khuyến nghị header X-API-Key. Tài liệu nêu mức 60 request/phút/key, phân trang và lọc tài khoản/ngày. Vì vậy không xem đây là nguồn thời gian thực. Chỉ chủ hệ thống cần kết nối affiliate; người mua không cần cung cấp cookie Shopee. [Nguồn](https://addlivetag.com/shopee-affiliate-api/conversion_data.php)
 
 Đọc được tài liệu không đồng nghĩa API đang hoạt động đúng như mô tả. Chưa có phản hồi nghiệp vụ thực tế bằng API key/App ID của dự án; lần đọc endpoint sản phẩm công khai qua công cụ web không lấy được phản hồi để xác minh.
@@ -46,8 +72,13 @@ REST conversion của Addlivetag dùng dữ liệu đã đồng bộ từ tài k
 | Báo thiếu đơn | Chọn lần mua, gửi yêu cầu kiểm tra | Nhật ký chuyển hướng và hệ thống hỗ trợ | MVP |
 | Trang vận hành | Kiểm tra đơn chưa khớp, đồng bộ lỗi, duyệt chi | Quyền quản trị và nhật ký thay đổi | MVP |
 | Danh sách yêu thích | Lưu sản phẩm đã tra cứu | Dữ liệu nội bộ | Sau MVP |
-| Theo dõi biến động giá | Xem các mốc giá đã quan sát, đặt ngưỡng | Thu thập snapshot riêng theo thời gian | Sau MVP |
-| Khám phá sản phẩm | Tìm theo từ khóa, lọc theo nhu cầu | Product offers hoặc danh mục tự tuyển chọn | Sau MVP |
+| **Biểu đồ giá & “giá tốt nhất”** | Line chart 30–90 ngày, badge lowest/highest | `price-tracking/history.php` | **Ưu tiên 1 (xem mục 11)** |
+| **Tra hàng loạt (batch)** | Dán nhiều link/ID → bảng hoàn dự kiến + export | `product-data-batch.php` | **Ưu tiên 1** |
+| **Săn SP hoa hồng cao** | Tìm theo từ khóa, sort % hoa hồng, lọc giá | `offers/*.php` | **Ưu tiên 2** |
+| **Cảnh báo shop giảm hoa hồng** | Danh sách shop đổi rate 7/30 ngày | `shop-changes.php` | **Ưu tiên 2** |
+| **So sánh TikTok Shop** | Cùng SP: giá / hoa hồng bên nào lời hơn | `tiktok/find-by-shopee.php` | Ưu tiên 3 |
+| Theo dõi biến động giá | Xem các mốc giá đã quan sát, đặt ngưỡng | `price-tracking/history.php` hoặc snapshot riêng | Ưu tiên 2 (đã có history API) |
+| Khám phá sản phẩm / ngách | Thị trường theo từ khóa, HHI, blue-ocean | `search/market.php` + offers | Ưu tiên 3 |
 | Hiệu quả cộng tác viên | Click, đơn, tiền thực nhận theo kênh | Mã kênh và quy tắc ghi nhận riêng | Sau MVP |
 | ShopeeFood | Hành trình hoàn tiền riêng | Xác minh tracking và hoa hồng riêng | Ngoài MVP |
 

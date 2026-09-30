@@ -1,33 +1,39 @@
-import { config } from './env.js'
 import { fetchOutbound } from './logger.js'
+import { getSetting } from './settings-service.js'
 
 const shopeeHosts = new Set(['shopee.vn', 'www.shopee.vn', 's.shopee.vn', 'shope.ee', 'vn.shp.ee'])
 
 function requireConfig() {
-  if (!config.addlivetagApiKey) {
-    throw new Error('Chưa cấu hình ADDLIVETAG_API_KEY ở máy chủ.')
+  if (!getSetting('addlivetag_api_key')) {
+    throw new Error('Chưa cấu hình Addlivetag API Key (Admin → Cài đặt hoặc .env).')
   }
 }
 
 export async function fetchProductData({ url, itemId, subIds = [], sessionId } = {}) {
   requireConfig()
 
+  const apiKey = getSetting('addlivetag_api_key')
+  const productApiBase = getSetting('product_api_base')
+  const affiliateId = getSetting('shopee_affiliate_id')
+  const baseRate = getSetting('shopee_base_rate')
+  const capRaw = getSetting('shopee_cap_raw')
+
   const query = {}
   if (url) query.url = url
   if (itemId) query.item_id = String(itemId)
-  if (config.shopeeAffiliateId) query.affid = config.shopeeAffiliateId
+  if (affiliateId) query.affid = affiliateId
   // base_rate / cap theo docs product-data-api.md — khớp tỷ lệ tài khoản affiliate
-  if (config.shopeeBaseRate) query.base_rate = config.shopeeBaseRate
-  if (config.shopeeCapRaw) query.cap = config.shopeeCapRaw
+  if (baseRate) query.base_rate = baseRate
+  if (capRaw) query.cap = capRaw
   subIds.filter(Boolean).slice(0, 5).forEach((value, index) => {
     query[`sub${index + 1}`] = String(value).replace(/-/g, '_').slice(0, 50)
   })
 
   const { response, body } = await fetchOutbound({
     label: 'addlivetag:product-data',
-    url: config.productApiBase,
+    url: productApiBase,
     method: 'GET',
-    headers: { 'X-API-Key': config.addlivetagApiKey },
+    headers: { 'X-API-Key': apiKey },
     query,
     sessionId,
     timeoutMs: 15_000,

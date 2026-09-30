@@ -1,5 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
+import PriceHistoryChart from './PriceHistoryChart.vue'
+import TikTokCompareCard from './TikTokCompareCard.vue'
+import LazadaCompareCard from './LazadaCompareCard.vue'
 
 const props = defineProps({ link: { type: Object, required: true } })
 const emit = defineEmits(['new-link'])
@@ -57,6 +60,15 @@ async function copy() {
         <strong v-if="link.productPrice">{{ formatPrice(link.productPrice) }}</strong>
       </div>
     </article>
+
+    <!-- Lịch sử giá (doc 01) -->
+    <PriceHistoryChart v-if="link.id" :link-id="link.id" />
+
+    <!-- So TikTok (doc 05) -->
+    <TikTokCompareCard v-if="link.id" :link-id="link.id" />
+
+    <!-- So Lazada (doc 09) -->
+    <LazadaCompareCard v-if="link.id" :link-id="link.id" />
 
     <div class="result-link">
       <span>Link mua hàng của bạn</span>

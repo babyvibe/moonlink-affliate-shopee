@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="bg" cx="30%" cy="25%" r="90%">
+      <stop offset="0%" stop-color="#20265a"/>
+      <stop offset="60%" stop-color="#10152e"/>
+      <stop offset="100%" stop-color="#070b1c"/>
+    </radialGradient>
+    <radialGradient id="moon" cx="34%" cy="28%" r="75%">
+      <stop offset="0%" stop-color="#fffdeb"/>
+      <stop offset="35%" stop-color="#e0e0d4"/>
+      <stop offset="70%" stop-color="#a5a9ae"/>
+      <stop offset="100%" stop-color="#777b88"/>
+    </radialGradient>
+  </defs>
+  <!-- nền vũ trụ -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <!-- ngôi sao nhỏ -->
+  <circle cx="12" cy="14" r="1.4" fill="#cfd7ff" opacity="0.9"/>
+  <circle cx="52" cy="18" r="1" fill="#cfd7ff" opacity="0.7"/>
+  <circle cx="50" cy="50" r="1.2" fill="#cfd7ff" opacity="0.6"/>
+  <!-- mặt trăng -->
+  <circle cx="32" cy="32" r="19" fill="url(#moon)"/>
+  <!-- hố -->
+  <ellipse cx="24" cy="26" rx="5" ry="4" fill="#8d929f" opacity="0.55"/>
+  <ellipse cx="38" cy="36" rx="3.5" ry="3" fill="#8d929f" opacity="0.5"/>
+  <ellipse cx="30" cy="43" rx="2.2" ry="1.8" fill="#8d929f" opacity="0.45"/>
+  <!-- bóng tối bên phải (hiệu ứng lưỡi liềm / logo ◒) -->
+  <path d="M32 13 A19 19 0 0 1 32 51 A13 19 0 0 0 32 13 Z" fill="#0d1330" opacity="0.55"/>
+  <!-- viền phát sáng -->
+  <circle cx="32" cy="32" r="19" fill="none" stroke="#8b9dff" stroke-opacity="0.35" stroke-width="1.5"/>
+</svg>

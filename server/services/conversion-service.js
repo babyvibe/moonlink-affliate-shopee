@@ -1,12 +1,12 @@
-import { config } from './env.js'
 import { fetchOutbound } from './logger.js'
+import { getSetting } from './settings-service.js'
 
 const allowedTypes = new Set(['orders', 'items', 'clicks'])
 const allowedSources = new Set(['shopee', 'food'])
 
 function requireConfig() {
-  if (!config.addlivetagApiKey) {
-    throw new Error('Chưa cấu hình ADDLIVETAG_API_KEY ở máy chủ.')
+  if (!getSetting('addlivetag_api_key')) {
+    throw new Error('Chưa cấu hình Addlivetag API Key (Admin → Cài đặt hoặc .env).')
   }
 }
 
@@ -42,9 +42,9 @@ export async function fetchConversions({
 
   const { response, body } = await fetchOutbound({
     label: 'addlivetag:conversions',
-    url: config.conversionsApiBase,
+    url: getSetting('conversions_api_base'),
     method: 'GET',
-    headers: { 'X-API-Key': config.addlivetagApiKey },
+    headers: { 'X-API-Key': getSetting('addlivetag_api_key') },
     query,
     sessionId,
     timeoutMs: 20_000,
